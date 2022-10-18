@@ -23,45 +23,45 @@ class Tree
     end
 
     def insert(value)
-        @root = insertRecursive(@root, value)
+        @root = insert_recursive(@root, value)
     end
 
-    def insertRecursive(root, value) 
+    def insert_recursive(root, value) 
         if root == nil
             root = Node.new(value) 
             return root
         end
 
         if value < root.value
-            root.left = insertRecursive(root.left, value)
+            root.left = insert_recursive(root.left, value)
         elsif value > root.value
-            root.right = insertRecursive(root.right, value)
+            root.right = insert_recursive(root.right, value)
         end
 
         root
     end
 
     def delete(value)
-        @root = deleteRecursive(@root, value)
+        @root = delete_recursive(@root, value)
     end
 
-    def deleteRecursive(root, value)
+    def delete_recursive(root, value)
         if root.value == value
             root = nil 
             return root
         end
 
         if value < root.value
-            root.left = deleteRecursive(root.left, value)
+            root.left = delete_recursive(root.left, value)
         elsif value > root.value
-            root.right = deleteRecursive(root.right, value)
+            root.right = delete_recursive(root.right, value)
         else
             return root.right if root.left.nil?
             return root.left if root.right.nil?
 
             leftmost_leaf = leftmost_leaf(root.right)
             root.value = leftmost_leaf.value
-            root.right = deleteRecursive(leftmost_leaf, root.right.value)
+            root.right = delete_recursive(leftmost_leaf, root.right.value)
         end
         root
     end
@@ -79,6 +79,21 @@ class Tree
         return root if root.nil? || root.value == value
 
         value < root.value ? findRecursive(root.left, value) : findRecursive(root.right, value)
+    end
+
+    def level_order(root = @root)
+        return if root.nil?
+
+        queue = []
+        queue.push(root)
+
+        while !queue.empty? 
+            current = queue.shift
+            puts current.value
+            
+            queue.push(current.left) if !current.left.nil?
+            queue.push(current.right) if !current.right.nil?
+        end
     end
 
 end
@@ -102,5 +117,6 @@ tree.insert(9)
 
 pretty_print(tree.root)
 
-value_to_find = tree.find(12)&.value
-puts "Find element 8: #{value_to_find}"
+value_to_find = 12 
+puts "Find element : #{tree.find(value_to_find)&.value}"
+tree.level_order
