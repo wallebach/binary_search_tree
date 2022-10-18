@@ -96,6 +96,30 @@ class Tree
         end
     end
 
+    def preorder(root = @root)
+        return if root.nil?
+
+        puts root.value
+        preorder(root.left)
+        preorder(root.right)
+    end
+
+    def inorder(root = @root)
+        return if root.nil?
+
+        inorder(root.left)
+        puts root.value
+        inorder(root.right)
+    end
+
+    def postorder(root = @root)
+        return if root.nil?
+
+        postorder(root.left)
+        postorder(root.right)
+        puts root.value
+    end
+
 end
 
 def pretty_print(node = @root, prefix = '', is_left = true)
@@ -119,4 +143,6 @@ pretty_print(tree.root)
 
 value_to_find = 12 
 puts "Find element : #{tree.find(value_to_find)&.value}"
-tree.level_order
+# tree.level_order
+
+tree.postorder
