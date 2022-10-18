@@ -2,10 +2,12 @@ require_relative 'node.rb'
 
 class Tree
     attr_accessor :root
+    attr_accessor :data
 
     def initialize(data = []) 
         return if data.empty?
-        @root = build_tree(data, 0, data.length - 1)
+        @data = data.sort
+        @root = build_tree(@data, 0, @data.length - 1)
     end
 
     def build_tree(array, array_start, array_end)
@@ -72,13 +74,13 @@ class Tree
     end
 
     def find(value)
-        node = findRecursive(@root, value)
+        node = find_recursive(@root, value)
     end
 
-    def findRecursive(root, value)
+    def find_recursive(root, value)
         return root if root.nil? || root.value == value
 
-        value < root.value ? findRecursive(root.left, value) : findRecursive(root.right, value)
+        value < root.value ? find_recursive(root.left, value) : find_recursive(root.right, value)
     end
 
     def level_order(root = @root)
@@ -99,7 +101,7 @@ class Tree
     def preorder(root = @root)
         return if root.nil?
 
-        puts root.value
+        print "#{root.value} "
         preorder(root.left)
         preorder(root.right)
     end
@@ -108,7 +110,7 @@ class Tree
         return if root.nil?
 
         inorder(root.left)
-        puts root.value
+        print "#{root.value} "
         inorder(root.right)
     end
 
@@ -117,32 +119,75 @@ class Tree
 
         postorder(root.left)
         postorder(root.right)
-        puts root.value
+        print "#{root.value} "
+    end
+
+    def depth(value, root = @root)
+        return -1 if root == nil 
+
+        distance = -1 
+
+        if root.value == value || 
+            (distance = depth(value, root.left)) >= 0 || 
+            (distance = depth(value, root.right)) >= 0
+
+            return distance + 1
+        end
+
+        distance
+    end
+
+    def height(root = @root)
+        return -1 if root == nil
+
+        height_recursive(root.value, root)
+    end
+
+    def height_recursive(value, root = @root)
+        return -1 if root == nil
+
+        left_height = height_recursive(value, root.left)
+        right_height = height_recursive(value, root.right)
+
+        max = [left_height, right_height].max + 1 
+
+        return max if root.value == value
+        max
+    end
+
+    def balanced?(root = @root)
+        return true if root == nil
+
+        left_height = 0
+        right_height = 0
+
+        left_height = height(root.left)
+        right_height = height(root.right)
+
+        if (left_height - right_height).abs <= 1 && 
+            balanced?(root.left) && 
+            balanced?(root.right)
+        
+            return true
+        end
+
+        return false
+    end
+
+    def rebalance
+        nodes = inorder_array
+        @root = build_tree(nodes, 0, nodes.length - 1)
+    end
+
+    def inorder_array(root = @root, array = [])
+        unless root.nil? 
+            inorder_array(root.left, array)
+            array << root.value
+            inorder_array(root.right, array)
+        end
+        array
     end
 
 end
 
-def pretty_print(node = @root, prefix = '', is_left = true)
-    pretty_print(node.right, "#{prefix}#{is_left ? '│   ' : '    '}", false) if node.right
-    puts "#{prefix}#{is_left ? '└── ' : '┌── '}#{node.value}"
-    pretty_print(node.left, "#{prefix}#{is_left ? '    ' : '│   '}", true) if node.left
-end
 
-data = [1,2,3,4,5,6,7,15,16]
-
-tree = Tree.new(data)
-
-tree.insert(12)
-tree.insert(8)
-tree.insert(9)
-
-# tree.delete(4)
-# tree.delete(7)
-
-pretty_print(tree.root)
-
-value_to_find = 12 
-puts "Find element : #{tree.find(value_to_find)&.value}"
-# tree.level_order
-
-tree.postorder
